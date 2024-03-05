@@ -3,12 +3,13 @@ import axios from "axios";
 import React, { FC, useState } from "react";
 import { Redirect } from "react-router";
 import useSWR from "swr";
-import { Channels, Chats, Header, LogOutButton, MenuScroll, ProfileImg, ProfileModal, RightMenu, WorkspaceModal, WorkspaceName, WorkspaceWrapper, Workspaces } from "./styles";
+import { Channels, Chats, Header, LogOutButton, MenuScroll, ProfileImg, ProfileModal, RightMenu, WorkspaceButton, WorkspaceModal, WorkspaceName, WorkspaceWrapper, Workspaces } from "./styles";
 import gravatar from "gravatar";
 import Menu from "@components/Menu";
+import { Link } from "react-router-dom";
 
 const Workspace: FC = ({children}) => {
-    const { data, error, mutate } = useSWR('/api/users', fetcher);
+    const { data: userData, error, mutate } = useSWR('/api/users', fetcher);
     const [ showUserMenu, setShowUserMenu ] = useState(false);
     
     const onLogout = () => {
@@ -28,7 +29,12 @@ const Workspace: FC = ({children}) => {
       setShowUserMenu((prev) => !prev);
     }
 
-    if(!data)
+    const onClickUserProfile2 = () => {
+      setShowUserMenu((prev) => !prev);
+      console.log('test');
+    }
+
+    if(!userData)
     {
         return <Redirect to="/login" />;
     }
@@ -37,14 +43,14 @@ const Workspace: FC = ({children}) => {
         <div>
             <Header>
               <RightMenu>
-                <span onClick={onClickUserProfile}>
-                  <ProfileImg src={gravatar.url(data.nickname, {s: '28px', d: 'retro'})} alt={data.nickname}/>
+                <span onClick={onClickUserProfile2}>
+                  <ProfileImg src={gravatar.url(userData.nickname, {s: '28px', d: 'retro'})} alt={userData.nickname}/>
                   {showUserMenu && (
                     <Menu style={{right:0, top:38}} onCloseModal={onClickUserProfile}>
                       <ProfileModal>
-                        <img src={gravatar.url(data.nickname, {s: '36px', d: 'retro'})} alt={data.nickname} />
+                        <img src={gravatar.url(userData.nickname, {s: '36px', d: 'retro'})} alt={userData.nickname} />
                         <div>
-                          <span id="profile-name">{data.ninckname}</span>
+                          <span id="profile-name">{userData.ninckname}</span>
                           <span id="profile-active">Active</span>
                         </div>
                       </ProfileModal>
@@ -54,10 +60,15 @@ const Workspace: FC = ({children}) => {
                 </span>
               </RightMenu>
             </Header>
-            <button onClick={onLogout}>로그아웃</button>
             <WorkspaceWrapper>
               <Workspaces>
-                test
+                {userData.Workspace.map((ws)=> {
+                    return (
+                      <Link key={ws.id} to={`/workspaces/${123}/channel/일반`}>
+                        <WorkspaceButton>{ws.name.splice(0, 1).toUpperCase()}</WorkspaceButton>
+                      </Link>
+                    )
+                })}
               </Workspaces>
               <Channels>
                 <WorkspaceName>
