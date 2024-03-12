@@ -11,6 +11,7 @@ import { IUser, IWorkspace } from "@typings/db";
 import useInput from "@hooks/useInput";
 import Modal from "@components/Modal";
 import { Button, Input, Label } from "@pages/SignUp/styles";
+import { toast } from "react-toastify";
 
 const Workspace: FC = ({children}) => {
     const { data: userData, error, mutate } = useSWR<IUser | false>('/api/users', fetcher);
@@ -49,6 +50,31 @@ const Workspace: FC = ({children}) => {
     const onCloseModal = useCallback(() => {
       setShowCreateWorkspaceModal(false);
     }, []);
+
+
+    const onCreateWorkspace = useCallback((e) => {
+      e.preventDefault();
+      if(!newWorkspace || !newWorkspace.trim()) return;
+      if(!newUrl || !newUrl.trim()) return;
+
+      axios.post('/api/workspaces', {
+        workspace: newWorkspace,
+        url: newUrl
+      },{
+        withCredentials: true
+      })
+      .then(() => {
+        mutate();
+        setShowCreateWorkspaceModal(false);
+        setNewWorkspace('');
+        setNewUrl('');
+      })
+      .catch((error) => {
+        toast.error(error.response.data, {position: 'bottom-center'})
+      });
+
+    }, [newWorkspace, newUrl]);
+
 
     if(!userData)
     {
@@ -100,7 +126,7 @@ const Workspace: FC = ({children}) => {
               </Chats>
             </WorkspaceWrapper>
             <Modal show={showCreateWorkspaceModal} onCloseModal={onCloseModal}>
-                <form>
+                <form onSubmit={onCreateWorkspace}>
                   <Label id="workspace-label">
                     <span>워크스페이스 이름</span>
                     <Input id="workspace" value={newWorkspace} onChange={onChangeNewWorkspace}></Input>
