@@ -3,7 +3,7 @@ import React, { CSSProperties, FC, useCallback } from "react";
 import { CloseModalButton, CreateMenu } from "./styles";
 
 interface Props {
-    onCloseModal: () => void;
+    onCloseModal: (e: any) => void;
     style: CSSProperties;
     closeButton?: boolean;
 }
