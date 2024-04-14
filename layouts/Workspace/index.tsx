@@ -174,7 +174,7 @@ const Workspace: VFC = () => {
       </Header>
       <WorkspaceWrapper>
         <Workspaces>
-          {userData.Workspaces.map((ws) => {
+          {userData?.Workspaces.map((ws) => {
             return (
               <Link key={ws.id} to={`/workspace/${workspace}/channel/일반`}>
                 <WorkspaceButton>
@@ -202,7 +202,7 @@ const Workspace: VFC = () => {
                 <button onClick={onLogout}>로그아웃</button>
               </WorkspaceModal>
             </Menu>
-            {/* <ChannelList userData={userData} /> */}
+            <ChannelList />
             <DMList />
           </MenuScroll>
         </Channels>
