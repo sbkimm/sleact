@@ -32,6 +32,8 @@ import Channel from "@pages/Channel";
 import DirectMessage from "@pages/DirectMessage";
 import InviteWorkspaceModal from "@components/InviteWorkspaceModal";
 import InviteChannelModal from "@components/InviteChannelModal";
+import ChannelList from "@components/ChannelList";
+import DMList from "@components/DMList";
 
 const Workspace: VFC = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -53,6 +55,10 @@ const Workspace: VFC = () => {
   } = useSWR<IUser | false>("/api/users", fetcher);
   const { data: channelData } = useSWR<IChannel[]>(
     userData ? `/api/workspaces/${workspace}/channels` : null,
+    fetcher
+  );
+  const { data: memberData } = useSWR<IChannel[]>(
+    userData ? `/api/workspaces/${workspace}/members` : null,
     fetcher
   );
 
@@ -170,7 +176,7 @@ const Workspace: VFC = () => {
         <Workspaces>
           {userData.Workspaces.map((ws) => {
             return (
-              <Link key={ws.id} to={`/workspaces/${123}/channel/일반`}>
+              <Link key={ws.id} to={`/workspace/${workspace}/channel/일반`}>
                 <WorkspaceButton>
                   {ws.name.slice(0, 1).toUpperCase()}
                 </WorkspaceButton>
@@ -196,9 +202,8 @@ const Workspace: VFC = () => {
                 <button onClick={onLogout}>로그아웃</button>
               </WorkspaceModal>
             </Menu>
-            {channelData?.map((channel) => (
-              <div>{channel.name}</div>
-            ))}
+            {/* <ChannelList userData={userData} /> */}
+            <DMList />
           </MenuScroll>
         </Channels>
         <Chats>
