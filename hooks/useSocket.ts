@@ -1,9 +1,10 @@
 import { useCallback } from "react";
+import { Socket, io } from "socket.io-client";
 
 const backUrl = "http://localhost:3095";
 
-const sockets: { [key: string]: SocketIOClient.Socket } = {};
-const useSocket = (workspace?: string) => {
+const sockets: { [key: string]: Socket } = {};
+const useSocket = (workspace?: string): [Socket | undefined, () => void] => {
   const disconnect = useCallback(() => {
     if (workspace) {
       sockets[workspace].disconnect();
@@ -15,7 +16,11 @@ const useSocket = (workspace?: string) => {
     return [undefined, disconnect];
   }
 
-  sockets[workspace] = io.connect(`${backUrl}/ws-${workspace}`);
+  if (!sockets[workspace]) {
+    sockets[workspace] = io(`${backUrl}/ws-${workspace}`, {
+      transports: ["websocket"], //polling말고 websocket을 쓰도록 명시
+    });
+  }
 
   return [sockets[workspace], disconnect];
 };

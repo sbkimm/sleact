@@ -48,6 +48,7 @@ const Workspace: VFC = () => {
   const [newWorkspace, onChangeNewWorkspace, setNewWorkspace] = useInput("");
   const [newUrl, onChangeNewUrl, setNewUrl] = useInput("");
   const { workspace } = useParams<{ workspace: string }>();
+  const [socket, disconnect] = useSocket(workspace);
 
   const {
     data: userData,
@@ -62,16 +63,22 @@ const Workspace: VFC = () => {
     userData ? `/api/workspaces/${workspace}/members` : null,
     fetcher
   );
-  const [socket, disconnect] = useSocket(workspace);
 
   useEffect(() => {
-    if (channelData && memberData && socket) {
+    if (channelData && userData && socket) {
+      console.log(socket);
       socket.emit("login", {
         id: userData.id,
         channels: channelData.map((v) => v.id),
       });
     }
-  }, []);
+  }, [socket, channelData, userData]);
+
+  useEffect(() => {
+    return () => {
+      disconnect();
+    };
+  }, [workspace, disconnect]);
 
   const onLogout = () => {
     axios
