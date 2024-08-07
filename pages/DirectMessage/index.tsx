@@ -10,6 +10,7 @@ import ChatList from "@components/ChatList";
 import useInput from "@hooks/useInput";
 import axios from "axios";
 import { IDM } from "@typings/db";
+import makeSection from "@utils/\bmakeSection";
 
 const DirectMessage = () => {
   const { workspace, id } = useParams<{ workspace: string; id: string }>();
@@ -50,6 +51,8 @@ const DirectMessage = () => {
 
   if (!userData || !myData) return null;
 
+  const chatSections = makeSection(chatData ? [...chatData].reverse() : []);
+
   return (
     <Container>
       <Header>
@@ -59,7 +62,7 @@ const DirectMessage = () => {
         />
         <span>{userData.nickname}</span>
       </Header>
-      <ChatList chatData={chatData} />
+      <ChatList chatSections={chatSections} />
       <ChatBox
         chat={chat}
         onSubmitForm={handleSubmit}
